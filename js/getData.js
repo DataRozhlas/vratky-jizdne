@@ -1,6 +1,5 @@
 const https = require('https');
 const fs = require('fs');
-const d3 = require('d3');
 const roky = [2015,2016,2017,2018,2019];
 
 roky.forEach((rok, i) => {
@@ -9,5 +8,3 @@ roky.forEach((rok, i) => {
   const request = https.get(fileURL, response => response.pipe(file));
   console.log(fileURL);
 });
-
-console.log(d3);
