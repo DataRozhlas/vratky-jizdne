@@ -5,7 +5,7 @@ let vysledek = [];
 let itemsProcessed = 0;
 
 const parseData = (rok, callback) => {
-    fs.readFile('data/faktury_md_' + rok + '.csv', (err, data) => {
+    fs.readFileSync('data/faktury_md_' + rok + '.csv', (err, data) => {
         callback(d3.csvParse(data.toString('utf-8')));        
      });
 }
