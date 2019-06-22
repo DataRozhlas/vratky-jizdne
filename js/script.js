@@ -1,12 +1,7 @@
-﻿import { byeIE } from "./byeie"; // loučíme se s IE
+﻿import "./byeie"; // loučíme se s IE
 
-byeIE();
-
-/*
-// snadné načtení souboru pro každého!
-fetch("https://blabla.cz/blabla.json")
-  .then(response => response.json()) // nebo .text(), když to není json
+fetch("https://data.irozhlas.cz/vratky-jizdne/js/data/data.json")
+  .then(response => response.json())
   .then(data => {
-    // tady jde provést s daty cokoliv
+    console.log(data);
   });
-*/
