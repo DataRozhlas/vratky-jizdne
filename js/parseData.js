@@ -22,8 +22,8 @@ roky.forEach((rok, index, array) => {
         i: faktura.ICDOD,
         d: faktura.DODAVATEL,
         u: faktura.UCELPLATBY,
-        x: faktura.CASTKA,
-        y: new Date(faktura.DATVYST),
+        x: Number(faktura.CASTKA),
+        y: new Date(faktura.DATVYST).getTime(),
       }));
       kompenzace = kompenzace.sort((a, b) => a.dat - b.dat);
       fs.writeFileSync('data/data.json', JSON.stringify(kompenzace));
