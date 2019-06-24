@@ -5,6 +5,7 @@ const rendruj = (data) => {
   // unikatniIC.forEach((ic) => {
   //   console.log(data.filter(zaznam => ic === zaznam.ic));
   // });
+  // const dataArray = 
   console.log(data);
   Highcharts.stockChart('graf', {
     chart: {
@@ -32,10 +33,10 @@ const rendruj = (data) => {
   });
 };
 
-fetch('https://data.irozhlas.cz/vratky-jizdne/js/data/data.json')
+fetch('http://127.0.0.1:50571/js/data/data.json')
   .then((response) => {
     if (!response.ok) {
-      throw new Error('Error getting the stuff');
+      throw new Error('Error getting the data');
     }
     return response;
   })
