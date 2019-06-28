@@ -33,12 +33,12 @@ const rendruj = (data) => {
       }, {
         type: 'year',
         count: 1,
-        text: 'celý rok',
+        text: 'rok',
       }, {
         type: 'all',
-        text: 'všechno',
+        text: 'vše',
       }],
-      selected: 1,
+      selected: 0,
     },
     title: {
       text: 'Kompenzace slev z jízdného ve veřejné osobní dopravě proplacené ministerstvem dopravy',
@@ -56,15 +56,21 @@ const rendruj = (data) => {
       name: 'proplacené kompenzace',
       data: data,
       dataGrouping: {
-        units: [[
-          'month',
-          [1]]],
+        units: [['month', [1]]],
       },
     }],
+    navigator: {
+      series: {
+        type: 'column',
+        dataGrouping: {
+          units: [['month', [1]]],
+        },
+      },
+    },
   });
 };
 
-fetch('https://data.irozhlas.cz/vratky-jizdne/js/data/data.json')
+fetch('js/data/data.json')
   .then((response) => {
     if (!response.ok) {
       throw new Error('Error getting the data');
