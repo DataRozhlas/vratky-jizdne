@@ -7,14 +7,28 @@ const zaokrouhliDatum = (datum) => {
   return Date.UTC(datum.getFullYear(), (datum.getMonth() + 1), 1) - 8.64e+7;
 };
 
-const rendruj = (data) => {
-  const unikatniIC = [...new Set(data.map(x => x.ic))];
-  // unikatniIC.forEach((ic) => {
-  //   console.log(data.filter(zaznam => ic === zaznam.ic));
-  // });
-  // const dataArray =
-  console.log(data);
+const sectiPrachy = (faktury) => {
+  return faktury.reduce((acc, curr) => acc + curr.y, 0);
+};
 
+const zlidstiCislo = (cislo) => {
+  if (cislo > 999999999) {
+    return `${(cislo / 1000000000).toFixed(2)} miliardy`;
+  } if (cislo > 999999) {
+    return `${(cislo / 1000000).toFixed(2)} milionů`;
+  } if (cislo > 999) {
+    return `${(cislo / 1000).toFixed(2)} tisíc`;
+  } return cislo;
+};
+
+const generujSoucty = (dataMin, dataMax, data) => {
+  const vybranaData = data.filter(i => i.x >= dataMin && i.x <= dataMax);
+  const unikatniIC = [...new Set(vybranaData.map(x => x.i))];
+  const celkemKc = sectiPrachy(vybranaData);
+  console.log(dataMin, dataMax, vybranaData, unikatniIC, zlidstiCislo(celkemKc));
+};
+
+const rendruj = (data) => {
   // eslint-disable-next-line no-undef
   Highcharts.setOptions({
     lang: {
@@ -24,7 +38,7 @@ const rendruj = (data) => {
       numericSymbols: [' tis.', ' mil.', 'mld.', 'T', 'P', 'E'],
       rangeSelectorFrom: 'od',
       rangeSelectorTo: 'do',
-      rangeSelectorZoom: 'období',
+      rangeSelectorZoom: 'vyberte období:',
     },
   });
 
@@ -44,7 +58,8 @@ const rendruj = (data) => {
             if ((e.min !== minFirstDay || e.max !== maxFirstDay) && e.trigger === 'navigator') {
               graf.xAxis[0].setExtremes(minFirstDay, maxFirstDay);
             }
-          }, 500);
+            generujSoucty(minFirstDay, maxFirstDay, data);
+          }, 0);
         },
       },
     },
@@ -72,7 +87,7 @@ const rendruj = (data) => {
       text: 'Kompenzace slev z jízdného ve veřejné osobní dopravě proplacené ministerstvem dopravy',
     },
     subtitle: {
-      text: 'Faktury jsou v grafu zařazené podle data vystavení, fakturované kompenzace se mohou vztahovat k jinému období',
+      text: 'Jednotlivé faktury jsou v grafu zařazené podle data vystavení, fakturované kompenzace se mohou vztahovat k jinému období',
     },
     credits: {
       text: 'Zdroj: Uhrazené faktury – otevřená data ministerstva dopravy',
@@ -101,6 +116,7 @@ const rendruj = (data) => {
       },
     },
   });
+  generujSoucty(graf.rangeSelector.minInput.HCTime, graf.rangeSelector.maxInput.HCTime, data);
 };
 
 fetch('js/data/data.json')
