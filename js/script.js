@@ -26,6 +26,15 @@ const rendruj = (data) => {
     chart: {
       alignTicks: false,
     },
+    xAxis: {
+      events: {
+        afterSetExtremes(e) {
+          const minFirstDay = new Date(e.min);
+          console.log(minFirstDay);
+
+        },
+      },
+    },
     rangeSelector: {
       buttons: [{
         type: 'ytd',
@@ -38,7 +47,7 @@ const rendruj = (data) => {
         type: 'all',
         text: 'vše',
       }],
-      selected: 0,
+      selected: 1,
     },
     title: {
       text: 'Kompenzace slev z jízdného ve veřejné osobní dopravě proplacené ministerstvem dopravy',
@@ -51,6 +60,7 @@ const rendruj = (data) => {
       href: 'https://www.mdcr.cz/Ministerstvo/Otevrena-data/Faktury?returl=/Ministerstvo/Otevrena-data',
     },
     series: [{
+      color: '#d52834',
       turboThreshold: 4000,
       type: 'column',
       name: 'proplacené kompenzace',
@@ -59,6 +69,10 @@ const rendruj = (data) => {
         units: [['month', [1]]],
       },
     }],
+    tooltip: {
+      valueDecimals: 0,
+      valueSuffix: ' Kč',
+    },
     navigator: {
       series: {
         type: 'column',
