@@ -16,18 +16,18 @@ roky.forEach((rok, index, array) => {
     vysledek = vysledek.concat(data);
     itemsProcessed += 1;
     if (itemsProcessed === array.length) {
-      let kompenzace = vysledek.filter(faktura => faktura.UCELPLATBY.toUpperCase().includes('KOMPENZACE'));
-      kompenzace = kompenzace.map(faktura => ({
-        c: faktura.CISLOFA,
-        i: faktura.ICDOD,
-        d: faktura.DODAVATEL,
-        u: faktura.UCELPLATBY,
-        y: Number(faktura.CASTKA),
-        x: new Date(faktura.DATVYST).getTime(),
-      }));
-      kompenzace = kompenzace.sort((a, b) => a.x - b.x);
+      const kompenzace = vysledek.filter(faktura => faktura.UCELPLATBY.toUpperCase().includes('KOMPENZACE'))
+        .map(faktura => ({
+          c: faktura.CISLOFA,
+          i: faktura.ICDOD,
+          d: faktura.DODAVATEL,
+          u: faktura.UCELPLATBY,
+          y: Number(faktura.CASTKA),
+          x: new Date(faktura.DATVYST).getTime(),
+        }))
+        .sort((a, b) => a.x - b.x)
       // jen do konce dubna
-      kompenzace = kompenzace.filter(item => item.x < 1556661600000)
+        .filter(item => item.x < 1556661600000);
       fs.writeFileSync('data/data.json', JSON.stringify(kompenzace));
     }
   });
