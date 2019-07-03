@@ -1,5 +1,7 @@
 ﻿import './byeie'; // loučíme se s IE
 
+const Highcharts = require('highcharts/highstock');
+
 const zaokrouhliDatum = (datum) => {
   if (datum.getDate() < 15) {
     return Date.UTC(datum.getFullYear(), datum.getMonth(), 1);
@@ -29,7 +31,6 @@ const generujSoucty = (dataMin, dataMax, data) => {
 };
 
 const rendruj = (data) => {
-  // eslint-disable-next-line no-undef
   Highcharts.setOptions({
     lang: {
       months: ['ledna', 'února', 'března', 'dubna', 'května', 'června', 'července', 'srpna', 'září', 'října', 'listopadu', 'prosince'],
@@ -42,7 +43,6 @@ const rendruj = (data) => {
     },
   });
 
-  // eslint-disable-next-line no-undef
   const graf = Highcharts.stockChart('graf', {
     chart: {
       alignTicks: false,
