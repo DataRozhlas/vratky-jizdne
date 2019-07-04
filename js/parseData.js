@@ -26,8 +26,7 @@ roky.forEach((rok, index, array) => {
           x: new Date(faktura.DATVYST).getTime(),
         }))
         .sort((a, b) => a.x - b.x)
-      // jen do konce dubna
-        .filter(item => item.x < 1556661600000);
+        .filter(item => item.x < 1556661600000); // jen do konce dubna
       fs.writeFileSync('data/data.json', JSON.stringify(kompenzace));
     }
   });

@@ -9,9 +9,7 @@ const zaokrouhliDatum = (datum) => {
   return Date.UTC(datum.getFullYear(), (datum.getMonth() + 1), 1) - 8.64e+7;
 };
 
-const sectiPrachy = (faktury) => {
-  return faktury.reduce((acc, curr) => acc + curr.y, 0);
-};
+const sectiPrachy = faktury => faktury.reduce((acc, curr) => acc + curr.y, 0);
 
 const zlidstiCislo = (cislo) => {
   if (cislo > 999999999) {
@@ -27,7 +25,30 @@ const generujSoucty = (dataMin, dataMax, data) => {
   const vybranaData = data.filter(i => i.x >= dataMin && i.x <= dataMax);
   const unikatniIC = [...new Set(vybranaData.map(x => x.i))];
   const celkemKc = sectiPrachy(vybranaData);
-  console.log(dataMin, dataMax, vybranaData, unikatniIC, zlidstiCislo(celkemKc));
+  const veta1 = document.createElement('h3');
+  veta1.setAttribute('id', 'veta1');
+  veta1.textContent = `Ve vybraném období zaplatilo ministerstvo za slevy v osobní dopravě ${zlidstiCislo(celkemKc)} korun ${unikatniIC.length} dopravcům.`;
+  if (document.querySelector('#veta1')) {
+    document.querySelector('#veta1').remove();
+    document.querySelector('#graf').parentElement.append(veta1);
+  } else {
+    document.querySelector('#graf').parentElement.append(veta1);
+  }
+  if (dataMax - dataMin <= 3.154e+10 && dataMin >= 1420070400000) {
+    const vybrDataLoni = data.filter(i => i.x >= dataMin - 3.154e+10 && i.x <= dataMax - 3.154e+10);
+    const celkemKcLoni = sectiPrachy(vybrDataLoni);
+    const veta2 = document.createElement('p');
+    veta2.setAttribute('id', 'veta2');
+    veta2.textContent = `To je o ${zlidstiCislo(Math.abs(celkemKc - celkemKcLoni))} (${celkemKc > celkemKcLoni ? (celkemKc / celkemKcLoni * 100 - 100).toFixed(0) : (100 - celkemKc / celkemKcLoni * 100).toFixed(0)} %) ${celkemKc > celkemKcLoni ? 'víc' : 'míň'} než ve stejném období předchozího roku.`;
+    if (document.querySelector('#veta2')) {
+      document.querySelector('#veta2').remove();
+      document.querySelector('#graf').parentElement.append(veta2);
+    } else {
+      document.querySelector('#graf').parentElement.append(veta2);
+    }
+  } else if (document.querySelector('#veta2')) {
+    document.querySelector('#veta2').remove();
+  }
 };
 
 const rendruj = (data) => {
