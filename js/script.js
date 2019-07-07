@@ -49,6 +49,29 @@ const generujSoucty = (dataMin, dataMax, data) => {
   } else if (document.querySelector('#veta2')) {
     document.querySelector('#veta2').remove();
   }
+  // sečti dodavatele
+  let tabulkaDodavatelu = [];
+  unikatniIC.forEach((ic) => {
+    const vybranaDataDodavatel = vybranaData.filter(zaznam => zaznam.i === ic);
+    const celkemKcDodavatel = sectiPrachy(vybranaDataDodavatel);
+    const nazevDodavatel = vybranaDataDodavatel[0].d;
+    const pocetFaktur = vybranaDataDodavatel.length;
+    tabulkaDodavatelu.push(
+      {
+        celkemKcDodavatel,
+        nazevDodavatel,
+        pocetFaktur,
+      },
+    );
+  });
+  tabulkaDodavatelu = tabulkaDodavatelu.sort((a, b) => b.celkemKcDodavatel - a.celkemKcDodavatel);
+  const tabulka = document.createElement('table');
+  tabulka.setAttribute('id', 'dodavatele');
+  tabulka.append(document.createElement('tbody'));
+  //tabulkaDodavatelu.forEach(
+
+  //);
+  document.querySelector('#graf').parentElement.append(tabulka);
 };
 
 const rendruj = (data) => {
