@@ -1,4 +1,5 @@
 ﻿import './byeie'; // loučíme se s IE
+import { Modal } from './modal';
 
 const Highcharts = require('highcharts/highstock');
 
@@ -19,6 +20,14 @@ const zlidstiCislo = (cislo) => {
   } if (cislo > 999) {
     return `${(cislo / 1000).toFixed(2)} tisíc`;
   } return cislo;
+};
+
+// const formatNumber = num => num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
+
+const sklonujFakturu = (pocet) => {
+  if (pocet > 4) return 'faktur';
+  if (pocet === 1) return 'faktura';
+  return 'faktury';
 };
 
 const generujSoucty = (dataMin, dataMax, data) => {
@@ -42,10 +51,8 @@ const generujSoucty = (dataMin, dataMax, data) => {
     veta2.textContent = `To je o ${zlidstiCislo(Math.abs(celkemKc - celkemKcLoni))} (${celkemKc > celkemKcLoni ? (celkemKc / celkemKcLoni * 100 - 100).toFixed(0) : (100 - celkemKc / celkemKcLoni * 100).toFixed(0)} %) ${celkemKc > celkemKcLoni ? 'víc' : 'míň'} než ve stejném období předchozího roku.`;
     if (document.querySelector('#veta2')) {
       document.querySelector('#veta2').remove();
-      document.querySelector('#graf').parentElement.append(veta2);
-    } else {
-      document.querySelector('#graf').parentElement.append(veta2);
     }
+    document.querySelector('#graf').parentElement.append(veta2);    
   } else if (document.querySelector('#veta2')) {
     document.querySelector('#veta2').remove();
   }
@@ -68,9 +75,17 @@ const generujSoucty = (dataMin, dataMax, data) => {
   const tabulka = document.createElement('table');
   tabulka.setAttribute('id', 'dodavatele');
   tabulka.append(document.createElement('tbody'));
-  //tabulkaDodavatelu.forEach(
-
-  //);
+  let pocitadlo = 0;
+  tabulkaDodavatelu.forEach((zaznam) => {
+    pocitadlo += 1;
+    const radek = document.createElement('tr');
+    if (pocitadlo % 2 === 0) { radek.classList.add('barevny'); }
+    radek.innerHTML = `<td>${zaznam.nazevDodavatel}</td><td>${zaznam.pocetFaktur} ${sklonujFakturu(zaznam.pocetFaktur)}</td><td>${zlidstiCislo(Math.round(zaznam.celkemKcDodavatel))} Kč</td>`;
+    tabulka.firstChild.append(radek);
+  });
+  if (document.querySelector('#dodavatele')) {
+    document.querySelector('#dodavatele').remove();
+  }
   document.querySelector('#graf').parentElement.append(tabulka);
 };
 
@@ -160,7 +175,7 @@ const rendruj = (data) => {
       },
     },
   });
-  generujSoucty(graf.rangeSelector.minInput.HCTime, graf.rangeSelector.maxInput.HCTime, data);
+  generujSoucty(graf.rangeSelector.minInput.HCTime, graf.rangeSelector.maxInput.HCTime, data);  
 };
 
 fetch('js/data/data.json')
