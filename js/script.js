@@ -22,12 +22,41 @@ const zlidstiCislo = (cislo) => {
   } return cislo;
 };
 
-// const formatNumber = num => num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
+const formatNumber = num => num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
 
 const sklonujFakturu = (pocet) => {
   if (pocet > 4) return 'faktur';
   if (pocet === 1) return 'faktura';
   return 'faktury';
+};
+
+const vyplnTabulkuvModalu = (ic, vybranaData) => {
+  const vybraneFaktury = vybranaData.filter(i => i.i === ic);
+  const nazevTabulky = document.createElement('h3');
+  nazevTabulky.setAttribute('id', 'nazevTabulky');
+  nazevTabulky.innerText = `Faktury od dodavatele ${vybraneFaktury[0].d}`;
+  const tabulka = document.createElement('table');
+  tabulka.setAttribute('id', 'faktury');
+  const nadpis = document.createElement('tr');
+  nadpis.innerHTML = '<th scope="col">číslo</th><th scope="col">datum</th><th scope="col">účel platby</th><th scope="col" style="text-align:right;">částka</th>';
+  tabulka.append(nadpis);
+  tabulka.append(document.createElement('tbody'));
+  let pocitadlo = 0;
+  vybraneFaktury.forEach((zaznam) => {
+    pocitadlo += 1;
+    const radek = document.createElement('tr');
+    if (pocitadlo % 2 === 0) { radek.classList.add('barevny'); }
+    radek.innerHTML = `<td>${zaznam.c}</td><td>${new Date(zaznam.x).getDate()}. ${new Date(zaznam.x).getMonth() + 1}. ${new Date(zaznam.x).getFullYear()}</td><td>${zaznam.u}</td><td style='text-align:right;'>${formatNumber(zaznam.y)} Kč</td>`;
+    tabulka.append(radek);
+  });
+  if (document.querySelector('#faktury')) {
+    document.querySelector('#faktury').remove();
+  }
+  if (document.querySelector('#nazevTabulky')) {
+    document.querySelector('#nazevTabulky').remove();
+  }
+  document.querySelector('.modal-azr-content').append(nazevTabulky);
+  document.querySelector('.modal-azr-content').append(tabulka);
 };
 
 const generujSoucty = (dataMin, dataMax, data) => {
@@ -68,10 +97,12 @@ const generujSoucty = (dataMin, dataMax, data) => {
         celkemKcDodavatel,
         nazevDodavatel,
         pocetFaktur,
+        ic,
       },
     );
   });
   tabulkaDodavatelu = tabulkaDodavatelu.sort((a, b) => b.celkemKcDodavatel - a.celkemKcDodavatel);
+  // kresli tabulku
   const tabulka = document.createElement('table');
   tabulka.setAttribute('id', 'dodavatele');
   tabulka.append(document.createElement('tbody'));
@@ -80,13 +111,22 @@ const generujSoucty = (dataMin, dataMax, data) => {
     pocitadlo += 1;
     const radek = document.createElement('tr');
     if (pocitadlo % 2 === 0) { radek.classList.add('barevny'); }
-    radek.innerHTML = `<td>${zaznam.nazevDodavatel}</td><td>${zaznam.pocetFaktur} ${sklonujFakturu(zaznam.pocetFaktur)}</td><td>${zlidstiCislo(Math.round(zaznam.celkemKcDodavatel))} Kč</td>`;
+    radek.innerHTML = `<td>${zaznam.nazevDodavatel}</td><td><a href='' id='${zaznam.ic}'> ${zaznam.pocetFaktur} ${sklonujFakturu(zaznam.pocetFaktur)}</a></td><td>${zlidstiCislo(Math.round(zaznam.celkemKcDodavatel))} Kč</td>`;
     tabulka.firstChild.append(radek);
   });
   if (document.querySelector('#dodavatele')) {
     document.querySelector('#dodavatele').remove();
   }
   document.querySelector('#graf').parentElement.append(tabulka);
+  const odkazy = document.querySelectorAll('#dodavatele a');
+  const myModal = new Modal('vypisFaktur');
+  odkazy.forEach((odkaz) => {
+    odkaz.addEventListener('click', (e) => {
+      e.preventDefault();
+      const ic = e.srcElement.id;
+      myModal.show(vyplnTabulkuvModalu(ic, vybranaData));
+    });
+  });
 };
 
 const rendruj = (data) => {
