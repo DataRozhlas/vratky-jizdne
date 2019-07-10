@@ -1,8 +1,16 @@
 ﻿import './byeie'; // loučíme se s IE
-import 'choices.js/public/assets/styles/choices.min.css';
-import Choices from 'choices.js';
+// import 'choices.js/public/assets/styles/choices.min.css';
+// import Choices from 'choices.js';
 import Highcharts from 'highcharts/highstock';
 import { Modal } from './modal';
+
+// připrav vybírátko
+// const vybiratko = document.querySelector('#vybiratko');
+
+/* const choices = new Choices(vybiratko, {
+  shouldSort: false,
+  itemSelectText: 'Stisknutím vyberte',
+}); */
 
 const zaokrouhliDatum = (datum) => {
   if (datum.getDate() < 15) {
@@ -36,17 +44,23 @@ const sklonujFakturu = (pocet) => {
   return 'faktury';
 };
 
-// připrav vybírátko
-const vybiratko = document.querySelector('#vybiratko');
+/* const naplnVybiratko = (data) => {
+  const vybiratkoChoices = data.map(dodavatel => ({
+    value: dodavatel.ic,
+    label: dodavatel.nazevDodavatel,
+  }));
 
-const choices = new Choices(vybiratko, {
-  shouldSort: false,
-  itemSelectText: 'Stisknutím vyberte',
-});
+  choices.setChoices([{ value: 0, label: 'Všichni' }, ...vybiratkoChoices], 'value', 'label', true);
 
-vybiratko.addEventListener('change', (e) => {
-  console.log(e.target.value);
-});
+  vybiratko.addEventListener('change', (e) => {
+    const dataVybranehoDopravce = data.filter((zaznam) => {
+      if (e.target.value === 0) { return data; }
+      return zaznam.i === e.target.value;
+    });
+    kresliGraf(dataVybranehoDopravce);
+    console.log(e.target.value, dataVybranehoDopravce);
+  });
+}; */
 
 const vyplnTabulkuvModalu = (ic, vybranaData) => {
   const vybraneFaktury = vybranaData.filter(i => i.i === ic);
@@ -67,7 +81,7 @@ const vyplnTabulkuvModalu = (ic, vybranaData) => {
     pocitadlo += 1;
     const radek = document.createElement('tr');
     const datum = new Date(zaznam.x);
-    if (pocitadlo % 2 === 0) { radek.classList.add('barevny'); }
+    if (pocitadlo % 2 !== 0) { radek.classList.add('barevny'); }
     radek.innerHTML = `<td>${zaznam.c}</td>`;
     radek.innerHTML += `<td>${datum.getDate()}. ${datum.getMonth() + 1}. ${datum.getFullYear()}</td>`;
     radek.innerHTML += `<td>${zaznam.u}</td>`;
@@ -127,16 +141,7 @@ const generujSoucty = (dataMin, dataMax, data) => {
     );
   });
   tabulkaDodavatelu = tabulkaDodavatelu.sort((a, b) => b.celkemKcDodavatel - a.celkemKcDodavatel);
-
-  // naplň vybírátko
-  const vybiratkoChoices = tabulkaDodavatelu.map(dodavatel => ({
-    value: dodavatel.ic,
-    label: dodavatel.nazevDodavatel,
-  }));
-
-  choices.setChoices([{ value: 0, label: 'Všichni', selected: true }, ...vybiratkoChoices], 'value', 'label', true);
-
-  console.log(vybiratkoChoices);
+  // naplnVybiratko(tabulkaDodavatelu);
   // kresli tabulku
   const tabulka = document.createElement('table');
   tabulka.setAttribute('id', 'dodavatele');
@@ -145,7 +150,7 @@ const generujSoucty = (dataMin, dataMax, data) => {
   tabulkaDodavatelu.forEach((zaznam) => {
     pocitadlo += 1;
     const radek = document.createElement('tr');
-    if (pocitadlo % 2 === 0) { radek.classList.add('barevny'); }
+    if (pocitadlo % 2 !== 0) { radek.classList.add('barevny'); }
     radek.innerHTML = `<td>${zaznam.nazevDodavatel}</td>`;
     radek.innerHTML += `<td><a href='' id='${zaznam.ic}'> ${zaznam.pocetFaktur} ${sklonujFakturu(zaznam.pocetFaktur)}</a></td>`;
     radek.innerHTML += `<td>${zlidstiCislo(Math.round(zaznam.celkemKcDodavatel))} Kč</td>`;
@@ -177,7 +182,7 @@ const generujSoucty = (dataMin, dataMax, data) => {
   });
 };
 
-const rendruj = (data) => {
+const kresliGraf = (data) => {
   Highcharts.setOptions({
     lang: {
       months: ['ledna', 'února', 'března', 'dubna', 'května', 'června', 'července', 'srpna', 'září', 'října', 'listopadu', 'prosince'],
@@ -299,6 +304,6 @@ fetch('js/data/data.json')
   })
   .then(result => result.json())
   .then((data) => {
-    rendruj(data);
+    kresliGraf(data);
   })
   .catch(err => console.log(err));
