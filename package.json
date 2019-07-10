@@ -21,6 +21,7 @@
     "@babel/core": "^7.4.3",
     "@babel/preset-env": "^7.4.3",
     "babel-loader": "^8.0.5",
+    "choices.js": "^7.0.0",
     "clean-css": "^4.2.1",
     "csv": "^5.1.1",
     "csv-parser": "^2.3.0",
