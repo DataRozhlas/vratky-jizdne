@@ -36,6 +36,18 @@ const sklonujFakturu = (pocet) => {
   return 'faktury';
 };
 
+// připrav vybírátko
+const vybiratko = document.querySelector('#vybiratko');
+
+const choices = new Choices(vybiratko, {
+  shouldSort: false,
+  itemSelectText: 'Stisknutím vyberte',
+});
+
+vybiratko.addEventListener('change', (e) => {
+  console.log(e.target.value);
+});
+
 const vyplnTabulkuvModalu = (ic, vybranaData) => {
   const vybraneFaktury = vybranaData.filter(i => i.i === ic);
   const nazevTabulky = document.createElement('h3');
@@ -117,18 +129,14 @@ const generujSoucty = (dataMin, dataMax, data) => {
   tabulkaDodavatelu = tabulkaDodavatelu.sort((a, b) => b.celkemKcDodavatel - a.celkemKcDodavatel);
 
   // naplň vybírátko
-  const vybiratko = document.querySelector('#vybiratko');
+  const vybiratkoChoices = tabulkaDodavatelu.map(dodavatel => ({
+    value: dodavatel.ic,
+    label: dodavatel.nazevDodavatel,
+  }));
 
-  const vybiratkoChoices = tabulkaDodavatelu.map(dodavatel => ({ value: dodavatel.ic, label: dodavatel.nazevDodavatel }));
+  choices.setChoices([{ value: 0, label: 'Všichni', selected: true }, ...vybiratkoChoices], 'value', 'label', true);
 
-  const choices = new Choices(vybiratko, {
-    placeholderValue: 'Všichni',
-    shouldSort: false,
-    choices: [{ value: 0, label: 'Všichni' }, ...vybiratkoChoices],
-  });
-
-  vybiratko.addEventListener('change', (e) => console.log(e.target.value));
-
+  console.log(vybiratkoChoices);
   // kresli tabulku
   const tabulka = document.createElement('table');
   tabulka.setAttribute('id', 'dodavatele');
@@ -248,13 +256,26 @@ const rendruj = (data) => {
       data,
       dataGrouping: {
         units: [['month', [1]]],
+        dateTimeLabelFormats: {
+          millisecond: [
+            '%A, %b %e, %H:%M:%S.%L', '%A, %b %e, %H:%M:%S.%L', '-%H:%M:%S.%L',
+          ],
+          second: ['%A, %b %e, %H:%M:%S', '%A, %b %e, %H:%M:%S', '-%H:%M:%S'],
+          minute: ['%A, %b %e, %H:%M', '%A, %b %e, %H:%M', '-%H:%M'],
+          hour: ['%A, %b %e, %H:%M', '%A, %b %e, %H:%M', '-%H:%M'],
+          day: ['%A, %b %e, %Y', '%A, %b %e', '-%A, %b %e, %Y'],
+          week: ['Week from %A, %b %e, %Y', '%A, %b %e', '-%A, %b %e, %Y'],
+          month: ['%b %Y', '%b', '-%b %Y'],
+          year: ['%Y', '%Y', '-%Y'],
+        },
       },
     }],
     tooltip: {
       valueDecimals: 0,
       valueSuffix: ' Kč',
+      split: false,
       dateTimeLabelFormats: {
-        month: '%Y',
+        month: '%b %Y',
       },
     },
     navigator: {
