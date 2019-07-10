@@ -66,7 +66,7 @@ const vyplnTabulkuvModalu = (ic, vybranaData) => {
   const vybraneFaktury = vybranaData.filter(i => i.i === ic);
   const nazevTabulky = document.createElement('h3');
   nazevTabulky.setAttribute('id', 'nazevTabulky');
-  nazevTabulky.innerText = `Faktury od dodavatele ${vybraneFaktury[0].d}`;
+  nazevTabulky.innerText = `Faktury dopravce ${vybraneFaktury[0].d}`;
   const tabulka = document.createElement('table');
   tabulka.setAttribute('id', 'faktury');
   const nadpis = document.createElement('tr');
@@ -247,7 +247,7 @@ const kresliGraf = (data) => {
       text: 'Kompenzace slev z jízdného ve veřejné osobní dopravě proplacené ministerstvem dopravy',
     },
     subtitle: {
-      text: 'Jednotlivé faktury jsou v grafu zařazené podle data vystavení, fakturované kompenzace se mohou vztahovat k jinému období',
+      text: 'Jednotlivé faktury jsou v grafu zařazené podle data vystavení',
     },
     credits: {
       text: 'Zdroj: Uhrazené faktury – otevřená data ministerstva dopravy',
@@ -295,7 +295,7 @@ const kresliGraf = (data) => {
   generujSoucty(graf.rangeSelector.minInput.HCTime, graf.rangeSelector.maxInput.HCTime, data);
 };
 
-fetch('js/data/data.json')
+fetch('https://data.irozhlas.cz/vratky-jizdne/js/data/data.json')
   .then((response) => {
     if (!response.ok) {
       throw new Error('Error getting the data');
