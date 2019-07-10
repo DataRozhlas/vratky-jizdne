@@ -81,7 +81,7 @@ const generujSoucty = (dataMin, dataMax, data) => {
     if (document.querySelector('#veta2')) {
       document.querySelector('#veta2').remove();
     }
-    document.querySelector('#graf').parentElement.append(veta2);    
+    document.querySelector('#graf').parentElement.append(veta2);
   } else if (document.querySelector('#veta2')) {
     document.querySelector('#veta2').remove();
   }
@@ -215,7 +215,7 @@ const rendruj = (data) => {
       },
     },
   });
-  generujSoucty(graf.rangeSelector.minInput.HCTime, graf.rangeSelector.maxInput.HCTime, data);  
+  generujSoucty(graf.rangeSelector.minInput.HCTime, graf.rangeSelector.maxInput.HCTime, data);
 };
 
 fetch('js/data/data.json')

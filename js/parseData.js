@@ -16,7 +16,7 @@ roky.forEach((rok, index, array) => {
     vysledek = vysledek.concat(data);
     itemsProcessed += 1;
     if (itemsProcessed === array.length) {
-      const kompenzace = vysledek.filter(faktura => faktura.UCELPLATBY.toUpperCase().includes('KOMPENZACE'))
+      const kompenzace = vysledek.filter(faktura => faktura.UCELPLATBY.toUpperCase().includes('KOMPENZACE') || faktura.UCELPLATBY.toUpperCase().includes('FDK'))
         .map(faktura => ({
           c: faktura.CISLOFA,
           i: faktura.ICDOD,
