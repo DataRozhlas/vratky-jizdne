@@ -12,20 +12,22 @@ const zaokrouhliDatum = (datum) => {
 
 const sectiPrachy = faktury => faktury.reduce((acc, curr) => acc + curr.y, 0);
 
+const desetinnaCarka = cislo => cislo.toString().replace('.', ',');
+
 const zlidstiCislo = (cislo) => {
   if (cislo > 999999999) {
-    if (window.innerWidth < 700) { return `${(cislo / 1000000000).toFixed(2)} mld.`; }
-    return `${(cislo / 1000000000).toFixed(2)} miliardy`;
+    if (window.innerWidth < 700) { return desetinnaCarka(`${(cislo / 1000000000).toFixed(2)} mld.`); }
+    return desetinnaCarka(`${(cislo / 1000000000).toFixed(2)} miliardy`);
   } if (cislo > 999999) {
-    if (window.innerWidth < 700) { return `${(cislo / 1000000).toFixed(2)} mil.`; }
-    return `${(cislo / 1000000).toFixed(2)} milionů`;
+    if (window.innerWidth < 700) { return desetinnaCarka(`${(cislo / 1000000).toFixed(2)} mil.`); }
+    return desetinnaCarka(`${(cislo / 1000000).toFixed(2)} milionů`);
   } if (cislo > 999) {
-    if (window.innerWidth < 700) { return `${(cislo / 1000).toFixed(2)} tis.`; }
-    return `${(cislo / 1000).toFixed(2)} tisíc`;
-  } return cislo;
+    if (window.innerWidth < 700) { return desetinnaCarka(`${(cislo / 1000).toFixed(2)} tis.`); }
+    return desetinnaCarka(`${(cislo / 1000).toFixed(2)} tisíc`);
+  } return desetinnaCarka(cislo);
 };
 
-const formatNumber = num => num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ');
+const formatNumber = num => desetinnaCarka(num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 '));
 
 const sklonujFakturu = (pocet) => {
   if (pocet > 4) return 'faktur';
@@ -55,7 +57,7 @@ const vyplnTabulkuvModalu = (ic, vybranaData) => {
     if (pocitadlo % 2 === 0) { radek.classList.add('barevny'); }
     radek.innerHTML = `<td>${zaznam.c}</td>`;
     radek.innerHTML += `<td>${datum.getDate()}. ${datum.getMonth() + 1}. ${datum.getFullYear()}</td>`;
-    radek.innerHTML += `<td>${zaznam.u}</td>`
+    radek.innerHTML += `<td>${zaznam.u}</td>`;
     radek.innerHTML += `<td style='text-align:right;'>${formatNumber(zaznam.y)} Kč</td>`;
     tabulka.append(radek);
   });
@@ -121,8 +123,8 @@ const generujSoucty = (dataMin, dataMax, data) => {
     pocitadlo += 1;
     const radek = document.createElement('tr');
     if (pocitadlo % 2 === 0) { radek.classList.add('barevny'); }
-    radek.innerHTML = `<td>${zaznam.nazevDodavatel}</td>`
-    radek.innerHTML += `<td><a href='' id='${zaznam.ic}'> ${zaznam.pocetFaktur} ${sklonujFakturu(zaznam.pocetFaktur)}</a></td>`
+    radek.innerHTML = `<td>${zaznam.nazevDodavatel}</td>`;
+    radek.innerHTML += `<td><a href='' id='${zaznam.ic}'> ${zaznam.pocetFaktur} ${sklonujFakturu(zaznam.pocetFaktur)}</a></td>`;
     radek.innerHTML += `<td>${zlidstiCislo(Math.round(zaznam.celkemKcDodavatel))} Kč</td>`;
     tabulka.firstChild.append(radek);
   });
@@ -132,6 +134,17 @@ const generujSoucty = (dataMin, dataMax, data) => {
   document.querySelector('#graf').parentElement.append(tabulka);
   const odkazy = document.querySelectorAll('#dodavatele a');
   const myModal = new Modal('vypisFaktur');
+  document.onkeydown = (e) => {
+    let isEscape = false;
+    if ('key' in e) {
+      isEscape = (e.key === 'Escape' || e.key === 'Esc');
+    } else {
+      isEscape = (e.keyCode === 27);
+    }
+    if (isEscape) {
+      myModal.hide();
+    }
+  };
   odkazy.forEach((odkaz) => {
     odkaz.addEventListener('click', (e) => {
       e.preventDefault();
