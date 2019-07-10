@@ -118,19 +118,17 @@ const generujSoucty = (dataMin, dataMax, data) => {
 
   // naplň vybírátko
   const vybiratko = document.querySelector('#vybiratko');
-  /*
-  tabulkaDodavatelu.forEach((dodavatel) => {
-    const polozka = document.createElement('option');
-    polozka.setAttribute('value', dodavatel.ic);
-    polozka.textContent = dodavatel.nazevDodavatel;
-    vybiratko.append(polozka);
-  });
-  */
+
+  const vybiratkoChoices = tabulkaDodavatelu.map(dodavatel => ({ value: dodavatel.ic, label: dodavatel.nazevDodavatel }));
+
   const choices = new Choices(vybiratko, {
     placeholderValue: 'Všichni',
-    choices: [{value: "a", label: "a"}]
+    shouldSort: false,
+    choices: [{ value: 0, label: 'Všichni' }, ...vybiratkoChoices],
   });
-  
+
+  vybiratko.addEventListener('change', (e) => console.log(e.target.value));
+
   // kresli tabulku
   const tabulka = document.createElement('table');
   tabulka.setAttribute('id', 'dodavatele');
