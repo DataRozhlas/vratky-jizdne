@@ -14,10 +14,13 @@ const sectiPrachy = faktury => faktury.reduce((acc, curr) => acc + curr.y, 0);
 
 const zlidstiCislo = (cislo) => {
   if (cislo > 999999999) {
+    if (window.innerWidth < 700) { return `${(cislo / 1000000000).toFixed(2)} mld.`; }
     return `${(cislo / 1000000000).toFixed(2)} miliardy`;
   } if (cislo > 999999) {
+    if (window.innerWidth < 700) { return `${(cislo / 1000000).toFixed(2)} mil.`; }
     return `${(cislo / 1000000).toFixed(2)} milionů`;
   } if (cislo > 999) {
+    if (window.innerWidth < 700) { return `${(cislo / 1000).toFixed(2)} tis.`; }
     return `${(cislo / 1000).toFixed(2)} tisíc`;
   } return cislo;
 };
@@ -38,15 +41,22 @@ const vyplnTabulkuvModalu = (ic, vybranaData) => {
   const tabulka = document.createElement('table');
   tabulka.setAttribute('id', 'faktury');
   const nadpis = document.createElement('tr');
-  nadpis.innerHTML = '<th scope="col">číslo</th><th scope="col">datum</th><th scope="col">účel platby</th><th scope="col" style="text-align:right;">částka</th>';
+  nadpis.innerHTML = '<th scope="col">číslo</th>';
+  nadpis.innerHTML += '<th scope="col">datum</th>';
+  nadpis.innerHTML += '<th scope="col">účel platby</th>';
+  nadpis.innerHTML += '<th scope="col" style="text-align:right;">částka</th>';
   tabulka.append(nadpis);
   tabulka.append(document.createElement('tbody'));
   let pocitadlo = 0;
   vybraneFaktury.forEach((zaznam) => {
     pocitadlo += 1;
     const radek = document.createElement('tr');
+    const datum = new Date(zaznam.x);
     if (pocitadlo % 2 === 0) { radek.classList.add('barevny'); }
-    radek.innerHTML = `<td>${zaznam.c}</td><td>${new Date(zaznam.x).getDate()}. ${new Date(zaznam.x).getMonth() + 1}. ${new Date(zaznam.x).getFullYear()}</td><td>${zaznam.u}</td><td style='text-align:right;'>${formatNumber(zaznam.y)} Kč</td>`;
+    radek.innerHTML = `<td>${zaznam.c}</td>`;
+    radek.innerHTML += `<td>${datum.getDate()}. ${datum.getMonth() + 1}. ${datum.getFullYear()}</td>`;
+    radek.innerHTML += `<td>${zaznam.u}</td>`
+    radek.innerHTML += `<td style='text-align:right;'>${formatNumber(zaznam.y)} Kč</td>`;
     tabulka.append(radek);
   });
   if (document.querySelector('#faktury')) {
@@ -111,7 +121,9 @@ const generujSoucty = (dataMin, dataMax, data) => {
     pocitadlo += 1;
     const radek = document.createElement('tr');
     if (pocitadlo % 2 === 0) { radek.classList.add('barevny'); }
-    radek.innerHTML = `<td>${zaznam.nazevDodavatel}</td><td><a href='' id='${zaznam.ic}'> ${zaznam.pocetFaktur} ${sklonujFakturu(zaznam.pocetFaktur)}</a></td><td>${zlidstiCislo(Math.round(zaznam.celkemKcDodavatel))} Kč</td>`;
+    radek.innerHTML = `<td>${zaznam.nazevDodavatel}</td>`
+    radek.innerHTML += `<td><a href='' id='${zaznam.ic}'> ${zaznam.pocetFaktur} ${sklonujFakturu(zaznam.pocetFaktur)}</a></td>`
+    radek.innerHTML += `<td>${zlidstiCislo(Math.round(zaznam.celkemKcDodavatel))} Kč</td>`;
     tabulka.firstChild.append(radek);
   });
   if (document.querySelector('#dodavatele')) {

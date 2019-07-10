@@ -2,6 +2,32 @@
     width: 100%;
 }
 
+.modal-azr-content {
+    max-width: 1070px;    
+}
+
+@media only screen and (max-width: 600px) {
+    .modal-azr-content {
+        overflow-x: scroll;
+        width: 99vw;
+    }
+    #dodavatele {
+        overflow-x: scroll;
+    }
+    #faktury td {
+        padding-right: 3px;
+        white-space: nowrap; 
+    }
+    #dodavatele td {
+        padding-right: 3px;
+    }
+
+}
+
+#faktury {
+    
+}
+
 .barevny {
     background-color: antiquewhite;
 }
