@@ -23,12 +23,14 @@
     "babel-loader": "^8.0.5",
     "choices.js": "^7.0.0",
     "clean-css": "^4.2.1",
+    "css-loader": "^3.0.0",
     "csv": "^5.1.1",
     "csv-parser": "^2.3.0",
     "d3": "^5.9.2",
     "highcharts": "^7.1.2",
     "marked": "^0.6.2",
     "node-yaml": "^3.2.0",
+    "style-loader": "^0.23.1",
     "webpack": "^4.30.0"
   },
   "devDependencies": {

@@ -1,8 +1,8 @@
 ﻿import './byeie'; // loučíme se s IE
+import 'choices.js/public/assets/styles/choices.min.css';
+import Choices from 'choices.js';
+import Highcharts from 'highcharts/highstock';
 import { Modal } from './modal';
-
-const Highcharts = require('highcharts/highstock');
-const Choices = require('choices.js');
 
 const zaokrouhliDatum = (datum) => {
   if (datum.getDate() < 15) {
@@ -118,16 +118,19 @@ const generujSoucty = (dataMin, dataMax, data) => {
 
   // naplň vybírátko
   const vybiratko = document.querySelector('#vybiratko');
+  /*
   tabulkaDodavatelu.forEach((dodavatel) => {
     const polozka = document.createElement('option');
     polozka.setAttribute('value', dodavatel.ic);
     polozka.textContent = dodavatel.nazevDodavatel;
     vybiratko.append(polozka);
   });
+  */
   const choices = new Choices(vybiratko, {
     placeholderValue: 'Všichni',
+    choices: [{value: "a", label: "a"}]
   });
-
+  
   // kresli tabulku
   const tabulka = document.createElement('table');
   tabulka.setAttribute('id', 'dodavatele');
