@@ -24,6 +24,6 @@
 
 }
 
-.barevny {
+#dodavatele > tbody > tr:nth-child(even), #faktury > tbody > tr:nth-child(even) {
     background-color: antiquewhite;
 }

@@ -1,167 +1,155 @@
 ﻿import './byeie'; // loučíme se s IE
-// import 'choices.js/public/assets/styles/choices.min.css';
-// import Choices from 'choices.js';
+import 'choices.js/public/assets/styles/choices.min.css';
+import Choices from 'choices.js';
 import Highcharts from 'highcharts/highstock';
 import { Modal } from './modal';
+import { kresliGraf } from './graf';
+import {
+  sectiPrachy, zlidstiCislo, formatNumber, sklonujFakturu,
+} from './helperFunctions';
 
-// připrav vybírátko
-// const vybiratko = document.querySelector('#vybiratko');
+// globalni state
+let kompletniData; // nacte se pri inicializaci z fetche, pak zustava stejne
+let vybranyDopravce = '0'; // meni se vybiratkem
+let dataMin; // meni se posunovatkem v grafu
+let dataMax; // meni se posunovatkem v grafu
+let vybiratko; // pri initu se naplni vybiratkem
+let modal; // pri initu se naplni modalem
 
-/* const choices = new Choices(vybiratko, {
-  shouldSort: false,
-  itemSelectText: 'Stisknutím vyberte',
-}); */
+// interni tabulka pro vybiratko a zobrazenou tabulku
+const vygenerujTabulkuDodavatelu = (vybranaData, unikatniIC) => unikatniIC
+  .map((ic) => {
+    const vybranaDataDodavatel = vybranaData.filter(zaznam => zaznam.i === ic);
+    return {
+      celkemKcDodavatel: sectiPrachy(vybranaDataDodavatel),
+      nazevDodavatel: vybranaDataDodavatel[0].d,
+      pocetFaktur: vybranaDataDodavatel.length,
+      ic,
+    };
+  })
+  .sort((a, b) => b.celkemKcDodavatel - a.celkemKcDodavatel);
 
-const zaokrouhliDatum = (datum) => {
-  if (datum.getDate() < 15) {
-    return Date.UTC(datum.getFullYear(), datum.getMonth(), 1);
-  }
-  return Date.UTC(datum.getFullYear(), (datum.getMonth() + 1), 1) - 8.64e+7;
+// modalni tabulka
+const vyplnTabulkuvModalu = (ic, vybranaData) => {
+  const vybraneFaktury = vybranaData.filter(i => i.i === ic);
+
+  const nazevTabulky = document.querySelector('#faktury-header');
+  nazevTabulky.innerText = `Faktury dopravce ${vybraneFaktury[0].d}`;
+
+  const tabulka = document.querySelector('#faktury > tbody');
+  tabulka.innerHTML = '';
+
+  vybraneFaktury.forEach((zaznam) => {
+    const radek = document.createElement('tr');
+    const datum = new Date(zaznam.x);
+    radek.innerHTML = `<td>${zaznam.c}</td>
+      <td>${datum.getDate()}. ${datum.getMonth() + 1}. ${datum.getFullYear()}</td>
+      <td>${zaznam.u}</td>
+      <td style='text-align:right;'>${formatNumber(zaznam.y)} Kč</td>`;
+    tabulka.append(radek);
+  });
 };
 
-const sectiPrachy = faktury => faktury.reduce((acc, curr) => acc + curr.y, 0);
-
-const desetinnaCarka = cislo => cislo.toString().replace('.', ',');
-
-const zlidstiCislo = (cislo) => {
-  if (cislo > 999999999) {
-    if (window.innerWidth < 700) { return desetinnaCarka(`${(cislo / 1000000000).toFixed(2)} mld.`); }
-    return desetinnaCarka(`${(cislo / 1000000000).toFixed(2)} miliardy`);
-  } if (cislo > 999999) {
-    if (window.innerWidth < 700) { return desetinnaCarka(`${(cislo / 1000000).toFixed(2)} mil.`); }
-    return desetinnaCarka(`${(cislo / 1000000).toFixed(2)} milionů`);
-  } if (cislo > 999) {
-    if (window.innerWidth < 700) { return desetinnaCarka(`${(cislo / 1000).toFixed(2)} tis.`); }
-    return desetinnaCarka(`${(cislo / 1000).toFixed(2)} tisíc`);
-  } return desetinnaCarka(cislo);
-};
-
-const formatNumber = num => desetinnaCarka(num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 '));
-
-const sklonujFakturu = (pocet) => {
-  if (pocet > 4) return 'faktur';
-  if (pocet === 1) return 'faktura';
-  return 'faktury';
-};
-
-/* const naplnVybiratko = (data) => {
+// update vybiratka
+const naplnVybiratko = (data) => {
   const vybiratkoChoices = data.map(dodavatel => ({
     value: dodavatel.ic,
     label: dodavatel.nazevDodavatel,
   }));
 
-  choices.setChoices([{ value: 0, label: 'Všichni' }, ...vybiratkoChoices], 'value', 'label', true);
-
-  vybiratko.addEventListener('change', (e) => {
-    const dataVybranehoDopravce = data.filter((zaznam) => {
-      if (e.target.value === 0) { return data; }
-      return zaznam.i === e.target.value;
-    });
-    kresliGraf(dataVybranehoDopravce);
-    console.log(e.target.value, dataVybranehoDopravce);
-  });
-}; */
-
-const vyplnTabulkuvModalu = (ic, vybranaData) => {
-  const vybraneFaktury = vybranaData.filter(i => i.i === ic);
-  const nazevTabulky = document.createElement('h3');
-  nazevTabulky.setAttribute('id', 'nazevTabulky');
-  nazevTabulky.innerText = `Faktury dopravce ${vybraneFaktury[0].d}`;
-  const tabulka = document.createElement('table');
-  tabulka.setAttribute('id', 'faktury');
-  const nadpis = document.createElement('tr');
-  nadpis.innerHTML = '<th scope="col">číslo</th>';
-  nadpis.innerHTML += '<th scope="col">datum</th>';
-  nadpis.innerHTML += '<th scope="col">účel platby</th>';
-  nadpis.innerHTML += '<th scope="col" style="text-align:right;">částka</th>';
-  tabulka.append(nadpis);
-  tabulka.append(document.createElement('tbody'));
-  let pocitadlo = 0;
-  vybraneFaktury.forEach((zaznam) => {
-    pocitadlo += 1;
-    const radek = document.createElement('tr');
-    const datum = new Date(zaznam.x);
-    if (pocitadlo % 2 !== 0) { radek.classList.add('barevny'); }
-    radek.innerHTML = `<td>${zaznam.c}</td>`;
-    radek.innerHTML += `<td>${datum.getDate()}. ${datum.getMonth() + 1}. ${datum.getFullYear()}</td>`;
-    radek.innerHTML += `<td>${zaznam.u}</td>`;
-    radek.innerHTML += `<td style='text-align:right;'>${formatNumber(zaznam.y)} Kč</td>`;
-    tabulka.append(radek);
-  });
-  if (document.querySelector('#faktury')) {
-    document.querySelector('#faktury').remove();
-  }
-  if (document.querySelector('#nazevTabulky')) {
-    document.querySelector('#nazevTabulky').remove();
-  }
-  document.querySelector('.modal-azr-content').append(nazevTabulky);
-  document.querySelector('.modal-azr-content').append(tabulka);
+  vybiratko.setChoices([{ value: '0', label: 'Všichni' }, ...vybiratkoChoices], 'value', 'label', true);
 };
 
-const generujSoucty = (dataMin, dataMax, data) => {
-  const vybranaData = data.filter(i => i.x >= dataMin && i.x <= dataMax);
-  const unikatniIC = [...new Set(vybranaData.map(x => x.i))];
+// popisek pod grafem
+const vypisPopisek = (data, vybranaData, pocetDopravcu) => {
   const celkemKc = sectiPrachy(vybranaData);
-  const veta1 = document.createElement('h3');
-  veta1.setAttribute('id', 'veta1');
-  veta1.textContent = `Ve vybraném období zaplatilo ministerstvo za slevy v osobní dopravě ${zlidstiCislo(celkemKc)} korun ${unikatniIC.length} dopravcům.`;
-  if (document.querySelector('#veta1')) {
-    document.querySelector('#veta1').remove();
-    document.querySelector('#graf').parentElement.append(veta1);
-  } else {
-    document.querySelector('#graf').parentElement.append(veta1);
-  }
+  const veta1 = `Ve vybraném období zaplatilo ministerstvo za slevy v osobní dopravě ${zlidstiCislo(celkemKc)} korun ${pocetDopravcu} dopravcům.`;
+  document.querySelector('#veta1').innerText = veta1;
+
   if (dataMax - dataMin <= 3.154e+10 && dataMin >= 1420070400000) {
     const vybrDataLoni = data.filter(i => i.x >= dataMin - 3.154e+10 && i.x <= dataMax - 3.154e+10);
     const celkemKcLoni = sectiPrachy(vybrDataLoni);
-    const veta2 = document.createElement('p');
-    veta2.setAttribute('id', 'veta2');
-    veta2.textContent = `To je o ${zlidstiCislo(Math.abs(celkemKc - celkemKcLoni))} (${celkemKc > celkemKcLoni ? (celkemKc / celkemKcLoni * 100 - 100).toFixed(0) : (100 - celkemKc / celkemKcLoni * 100).toFixed(0)} %) ${celkemKc > celkemKcLoni ? 'víc' : 'míň'} než ve stejném období předchozího roku.`;
-    if (document.querySelector('#veta2')) {
-      document.querySelector('#veta2').remove();
-    }
-    document.querySelector('#graf').parentElement.append(veta2);
-  } else if (document.querySelector('#veta2')) {
-    document.querySelector('#veta2').remove();
-  }
-  // sečti dodavatele
-  let tabulkaDodavatelu = [];
-  unikatniIC.forEach((ic) => {
-    const vybranaDataDodavatel = vybranaData.filter(zaznam => zaznam.i === ic);
-    const celkemKcDodavatel = sectiPrachy(vybranaDataDodavatel);
-    const nazevDodavatel = vybranaDataDodavatel[0].d;
-    const pocetFaktur = vybranaDataDodavatel.length;
-    tabulkaDodavatelu.push(
-      {
-        celkemKcDodavatel,
-        nazevDodavatel,
-        pocetFaktur,
-        ic,
-      },
-    );
-  });
-  tabulkaDodavatelu = tabulkaDodavatelu.sort((a, b) => b.celkemKcDodavatel - a.celkemKcDodavatel);
-  // naplnVybiratko(tabulkaDodavatelu);
-  // kresli tabulku
-  const tabulka = document.createElement('table');
-  tabulka.setAttribute('id', 'dodavatele');
-  tabulka.append(document.createElement('tbody'));
-  let pocitadlo = 0;
+    const veta2 = `To je o ${zlidstiCislo(Math.abs(celkemKc - celkemKcLoni))} (${celkemKc > celkemKcLoni ? (celkemKc / celkemKcLoni * 100 - 100).toFixed(0) : (100 - celkemKc / celkemKcLoni * 100).toFixed(0)} %) ${celkemKc > celkemKcLoni ? 'víc' : 'míň'} než ve stejném období předchozího roku.`;
+    document.querySelector('#veta2').innerText = veta2;
+  } else document.querySelector('#veta2').innerText = null;
+};
+
+// tabulka pod grafem
+const nakresliTabulku = (tabulkaDodavatelu, vybranaData) => {
+  const tabulka = document.querySelector('#dodavatele > tbody');
+  tabulka.innerHTML = '';
+
   tabulkaDodavatelu.forEach((zaznam) => {
-    pocitadlo += 1;
     const radek = document.createElement('tr');
-    if (pocitadlo % 2 !== 0) { radek.classList.add('barevny'); }
-    radek.innerHTML = `<td>${zaznam.nazevDodavatel}</td>`;
-    radek.innerHTML += `<td><a href='' id='${zaznam.ic}'> ${zaznam.pocetFaktur} ${sklonujFakturu(zaznam.pocetFaktur)}</a></td>`;
-    radek.innerHTML += `<td>${zlidstiCislo(Math.round(zaznam.celkemKcDodavatel))} Kč</td>`;
-    tabulka.firstChild.append(radek);
+    radek.innerHTML = `<td>${zaznam.nazevDodavatel}</td>
+    <td><a href='' id='${zaznam.ic}'> ${zaznam.pocetFaktur} ${sklonujFakturu(zaznam.pocetFaktur)}</a></td>
+    <td>${zlidstiCislo(Math.round(zaznam.celkemKcDodavatel))} Kč</td>`;
+    tabulka.append(radek);
   });
-  if (document.querySelector('#dodavatele')) {
-    document.querySelector('#dodavatele').remove();
-  }
-  document.querySelector('#graf').parentElement.append(tabulka);
+
   const odkazy = document.querySelectorAll('#dodavatele a');
-  const myModal = new Modal('vypisFaktur');
+  odkazy.forEach((odkaz) => {
+    odkaz.addEventListener('click', (e) => {
+      e.preventDefault();
+      const ic = e.srcElement.id;
+      modal.show(vyplnTabulkuvModalu(ic, vybranaData));
+    });
+  });
+};
+
+// render - provadi se po kazde změně grafu nebo vybírátka
+const rendruj = (grafRerender = false) => {
+  // filtr podle vybiratka
+  const data = vybranyDopravce === '0'
+    ? kompletniData
+    : kompletniData.filter(zaznam => zaznam.i === vybranyDopravce);
+
+  // načtení dat z grafoslajdítka
+  dataMin = Highcharts.charts.filter(el => el !== undefined)[0].rangeSelector.minInput.HCTime;
+  dataMax = Highcharts.charts.filter(el => el !== undefined)[0].rangeSelector.maxInput.HCTime;
+
+  // zpracovana data pro tabulku
+  const vybranaData = data.filter(i => i.x >= dataMin && i.x <= dataMax);
+  const unikatniIC = [...new Set(vybranaData.map(x => x.i))];
+  const tabulkaDodavatelu = vygenerujTabulkuDodavatelu(vybranaData, unikatniIC);
+
+  // zpracovana data pro vybiratko
+  const vybiratkoData = kompletniData.filter(i => i.x >= dataMin && i.x <= dataMax);
+  const vybiratkoIC = [...new Set(vybiratkoData.map(x => x.i))];
+  const vybiratkoTabulka = vygenerujTabulkuDodavatelu(vybiratkoData, vybiratkoIC);
+
+  // pokud překlik vybírátkem, rerenderuje se graf
+  if (grafRerender) { kresliGraf(data, rendruj); }
+
+  // render vybiratka, popisku pod grafem a tabulky
+  vypisPopisek(data, vybranaData, unikatniIC.length);
+  naplnVybiratko(vybiratkoTabulka);
+  nakresliTabulku(tabulkaDodavatelu, vybranaData);
+};
+
+// init
+const inicializuj = (data) => {
+  // ulozeni dat
+  kompletniData = data;
+
+  // init grafu (a event listeneru v nem)
+  kresliGraf(data, rendruj);
+
+  // globalni init vybiratka a modalu
+  modal = new Modal('vypisFaktur');
+
+  const vybiratkoContainer = document.querySelector('#vybiratko');
+  vybiratko = new Choices(vybiratkoContainer, {
+    shouldSort: false,
+    itemSelectText: 'Stisknutím vyberte',
+  });
+
+  // event listenery pro vybiratko a modal
+  vybiratkoContainer.addEventListener('change', (e) => {
+    vybranyDopravce = e.target.value;
+    rendruj(true);
+  });
+
   document.onkeydown = (e) => {
     let isEscape = false;
     if ('key' in e) {
@@ -169,141 +157,17 @@ const generujSoucty = (dataMin, dataMax, data) => {
     } else {
       isEscape = (e.keyCode === 27);
     }
-    if (isEscape) {
-      myModal.hide();
-    }
+    if (isEscape) modal.hide();
   };
-  odkazy.forEach((odkaz) => {
-    odkaz.addEventListener('click', (e) => {
-      e.preventDefault();
-      const ic = e.srcElement.id;
-      myModal.show(vyplnTabulkuvModalu(ic, vybranaData));
-    });
-  });
+
+  // prvni render
+  rendruj();
 };
 
-const kresliGraf = (data) => {
-  Highcharts.setOptions({
-    lang: {
-      months: ['ledna', 'února', 'března', 'dubna', 'května', 'června', 'července', 'srpna', 'září', 'října', 'listopadu', 'prosince'],
-      shortMonths: ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen', 'září', 'říjen', 'listopad', 'prosinec'],
-      decimalPoint: ',',
-      numericSymbols: [' tis.', ' mil.', 'mld.', 'T', 'P', 'E'],
-      rangeSelectorFrom: 'od',
-      rangeSelectorTo: 'do',
-      rangeSelectorZoom: 'vyberte období:',
-    },
-  });
-
-  const graf = Highcharts.stockChart('graf', {
-    chart: {
-      alignTicks: false,
-    },
-    xAxis: {
-      events: {
-        afterSetExtremes(e) {
-          let minFirstDay = new Date(e.min);
-          minFirstDay = zaokrouhliDatum(minFirstDay);
-          let maxFirstDay = new Date(e.max);
-          maxFirstDay = zaokrouhliDatum(maxFirstDay);
-          setTimeout(() => {
-            if ((e.min !== minFirstDay || e.max !== maxFirstDay) && e.trigger === 'navigator') {
-              graf.xAxis[0].setExtremes(minFirstDay, maxFirstDay);
-            }
-            generujSoucty(minFirstDay, maxFirstDay, data);
-          }, 0);
-        },
-      },
-    },
-    rangeSelector: {
-      inputDateFormat: '%e. %B %Y',
-      inputBoxBorderColor: '#FFFFFF',
-      buttonTheme: {
-        width: '100px',
-      },
-      buttonSpacing: 12,
-      buttons: [{
-        type: 'day',
-        count: 29,
-        text: 'měsíc',
-      }, {
-        type: 'ytd',
-        text: 'letos',
-      }, {
-        type: 'day',
-        count: 241,
-        text: 'od září',
-      }, {
-        type: 'day',
-        count: 364,
-        text: 'rok',
-      }, {
-        type: 'all',
-        text: 'vše',
-      }],
-      selected: 2,
-    },
-    title: {
-      text: 'Kompenzace slev z jízdného ve veřejné osobní dopravě proplacené ministerstvem dopravy',
-    },
-    subtitle: {
-      text: 'Jednotlivé faktury jsou v grafu zařazené podle data vystavení',
-    },
-    credits: {
-      text: 'Zdroj: Uhrazené faktury – otevřená data ministerstva dopravy',
-      href: 'https://www.mdcr.cz/Ministerstvo/Otevrena-data/Faktury?returl=/Ministerstvo/Otevrena-data',
-    },
-    series: [{
-      color: '#d52834',
-      turboThreshold: 4000,
-      type: 'column',
-      name: 'vyfakturované kompenzace',
-      data,
-      dataGrouping: {
-        units: [['month', [1]]],
-        dateTimeLabelFormats: {
-          millisecond: [
-            '%A, %b %e, %H:%M:%S.%L', '%A, %b %e, %H:%M:%S.%L', '-%H:%M:%S.%L',
-          ],
-          second: ['%A, %b %e, %H:%M:%S', '%A, %b %e, %H:%M:%S', '-%H:%M:%S'],
-          minute: ['%A, %b %e, %H:%M', '%A, %b %e, %H:%M', '-%H:%M'],
-          hour: ['%A, %b %e, %H:%M', '%A, %b %e, %H:%M', '-%H:%M'],
-          day: ['%A, %b %e, %Y', '%A, %b %e', '-%A, %b %e, %Y'],
-          week: ['Week from %A, %b %e, %Y', '%A, %b %e', '-%A, %b %e, %Y'],
-          month: ['%b %Y', '%b', '-%b %Y'],
-          year: ['%Y', '%Y', '-%Y'],
-        },
-      },
-    }],
-    tooltip: {
-      valueDecimals: 0,
-      valueSuffix: ' Kč',
-      split: false,
-      dateTimeLabelFormats: {
-        month: '%b %Y',
-      },
-    },
-    navigator: {
-      series: {
-        type: 'column',
-        dataGrouping: {
-          units: [['month', [1]]],
-        },
-      },
-    },
-  });
-  generujSoucty(graf.rangeSelector.minInput.HCTime, graf.rangeSelector.maxInput.HCTime, data);
-};
-
-fetch('https://data.irozhlas.cz/vratky-jizdne/js/data/data.json')
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error('Error getting the data');
-    }
-    return response;
-  })
-  .then(result => result.json())
-  .then((data) => {
-    kresliGraf(data);
-  })
-  .catch(err => console.log(err));
+// fetch po nacteni DOMu
+window.addEventListener('DOMContentLoaded', () => {
+  fetch('https://data.irozhlas.cz/vratky-jizdne/js/data/data.json')
+    .then(result => result.json())
+    .then(data => inicializuj(data))
+    .catch(err => console.log(err));
+});

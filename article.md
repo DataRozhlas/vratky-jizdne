@@ -10,14 +10,31 @@ Aplikace čerpá data z přehledu [proplacených faktur](https://www.mdcr.cz/Min
 V grafu si můžete zvolit období, které vás zajímá a součty se automaticky aktualizují. Dopravci v tabulce pod grafem jsou seřazení sestupně podle objemu proplacených slev ve vybraném období. Kliknutím na počet vystavených faktur u každého dopravce zobrazíte zdrojová data.
 
 <wide>
-<!--<label for="vybiratko">Vyberte dopravce:</label>
+<label for="vybiratko">Vyberte dopravce:</label>
 <select id="vybiratko">
-</select>-->
+</select>
 <div id="graf" style="height: 400px"></div>
+<div id="popisek">
+  <h3 id="veta1"></h3>
+  <p id="veta2"></p>
+</div>
+<table id="dodavatele">
+  <tbody></tbody>
+</table>
 </wide>
 <div class="modal-azr" id="vypisFaktur">
   <div class="modal-azr-content">
     <span class="close-modal">&times;</span>
+    <h3 id="faktury-header"></h3>
+    <table id="faktury">
+      <thead><tr>
+        <th scope="col">číslo</th>
+        <th scope="col">datum</th>
+        <th scope="col">účel platby</th>
+        <th scope="col" style="text-align:right;">částka</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
   </div>
 </div>
 
