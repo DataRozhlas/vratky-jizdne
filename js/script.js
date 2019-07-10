@@ -190,6 +190,10 @@ const rendruj = (data) => {
     rangeSelector: {
       inputDateFormat: '%e. %B %Y',
       inputBoxBorderColor: '#FFFFFF',
+      buttonTheme: {
+        width: '100px',
+      },
+      buttonSpacing: 12,
       buttons: [{
         type: 'day',
         count: 29,
@@ -197,6 +201,10 @@ const rendruj = (data) => {
       }, {
         type: 'ytd',
         text: 'letos',
+      }, {
+        type: 'day',
+        count: 241,
+        text: 'od září',
       }, {
         type: 'day',
         count: 364,
@@ -230,6 +238,9 @@ const rendruj = (data) => {
     tooltip: {
       valueDecimals: 0,
       valueSuffix: ' Kč',
+      dateTimeLabelFormats: {
+        month: '%Y',
+      },
     },
     navigator: {
       series: {
