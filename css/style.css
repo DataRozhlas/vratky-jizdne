@@ -24,6 +24,6 @@
 
 }
 
-#dodavatele > tbody > tr:nth-child(even), #faktury > tbody > tr:nth-child(even) {
+#dodavatele > tbody > tr:nth-child(odd), #faktury > tbody > tr:nth-child(odd) {
     background-color: antiquewhite;
 }

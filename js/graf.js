@@ -77,6 +77,7 @@ export const kresliGraf = (data, rerender) => {
       name: 'vyfakturované kompenzace',
       data,
       dataGrouping: {
+        forced: true,
         units: [['month', [1]]],
         dateTimeLabelFormats: {
           millisecond: [
@@ -104,6 +105,7 @@ export const kresliGraf = (data, rerender) => {
       series: {
         type: 'column',
         dataGrouping: {
+          forced: true,
           units: [['month', [1]]],
         },
       },
