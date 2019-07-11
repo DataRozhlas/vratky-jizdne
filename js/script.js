@@ -63,7 +63,8 @@ const naplnVybiratko = (data) => {
 // popisek pod grafem
 const vypisPopisek = (data, vybranaData, pocetDopravcu) => {
   const celkemKc = sectiPrachy(vybranaData);
-  const veta1 = `Ve vybraném období zaplatilo ministerstvo za slevy v osobní dopravě ${zlidstiCislo(celkemKc)} korun ${pocetDopravcu} dopravcům.`;
+  let veta1 = `Ve vybraném období zaplatilo ministerstvo za slevy v osobní dopravě ${zlidstiCislo(celkemKc)} korun ${pocetDopravcu} dopravcům.`;
+  if (pocetDopravcu === 1) { veta1 = `Ve vybraném období zaplatilo ministerstvo za slevy v osobní dopravě vybranému dopravci ${zlidstiCislo(celkemKc)}.`; }
   document.querySelector('#veta1').innerText = veta1;
 
   if (dataMax - dataMin <= 3.154e+10 && dataMin >= 1420070400000) {
