@@ -15,6 +15,7 @@ let dataMin; // meni se posunovatkem v grafu
 let dataMax; // meni se posunovatkem v grafu
 let vybiratko; // pri initu se naplni vybiratkem
 let modal; // pri initu se naplni modalem
+let initVybiratka = true;
 
 // interni tabulka pro vybiratko a zobrazenou tabulku
 const vygenerujTabulkuDodavatelu = (vybranaData, unikatniIC) => unikatniIC
@@ -57,7 +58,8 @@ const naplnVybiratko = (data) => {
     label: dodavatel.nazevDodavatel,
   }));
 
-  vybiratko.setChoices([{ value: '0', label: 'Všichni' }, ...vybiratkoChoices], 'value', 'label', true);
+  vybiratko.setChoices([{ value: '0', label: 'Všichni', selected: initVybiratka }, ...vybiratkoChoices], 'value', 'label', true);
+  initVybiratka = false;
 };
 
 // popisek pod grafem
