@@ -1,5 +1,5 @@
 title: "Kolik a komu platí ministerstvo dopravy za levnější jízdné pro studenty a důchodce"
-perex: "Tři a čtvrt miliardy korun zaplatilo ministerstvo dopravy od září do dubna za zlevněné jízdenky, zejména pro studenty a důchodce. Kompenzace slev z jízdného v osobní dopravě mu za tu dobu naúčtovalo 149 dopravních firem. A oproti stejnému období předchozího roku stouply náklady na slevy více než dvacetinásobně. Server iROZHLAS.cz přináší aplikaci, která porovnává výši kompenzací v čase i mezi jednotlivými dopravci."
+perex: "Server iROZHLAS.cz přináší aplikaci, která porovnává výši kompenzací v čase i mezi jednotlivými dopravci."
 styles: []
 libraries: [] #jquery, d3, highcharts, datatables
 options: [noheader, nopic] #wide, noheader (, nopic)

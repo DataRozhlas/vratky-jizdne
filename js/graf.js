@@ -41,15 +41,15 @@ export const kresliGraf = (data, rerender) => {
       buttonSpacing: 12,
       buttons: [{
         type: 'day',
-        count: 29,
+        count: 25,
         text: 'měsíc',
       }, {
         type: 'ytd',
         text: 'letos',
       }, {
         type: 'day',
-        count: 241,
-        text: 'od září',
+        count: 359,
+        text: 'od září 2018',
       }, {
         type: 'day',
         count: 364,
@@ -72,7 +72,7 @@ export const kresliGraf = (data, rerender) => {
     },
     series: [{
       color: '#d52834',
-      turboThreshold: 4000,
+      turboThreshold: 0,
       type: 'column',
       name: 'vyfakturované kompenzace',
       data,
