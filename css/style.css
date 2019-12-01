@@ -6,6 +6,14 @@
     max-width: 1070px;    
 }
 
+.zmiz {
+    display:none;
+}
+
+.knoflik {
+
+}
+
 @media only screen and (max-width: 600px) {
     .modal-azr-content {
         overflow-x: scroll;

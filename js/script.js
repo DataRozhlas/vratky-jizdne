@@ -98,6 +98,27 @@ const nakresliTabulku = (tabulkaDodavatelu, vybranaData) => {
       modal.show(vyplnTabulkuvModalu(ic, vybranaData));
     });
   });
+  if (tabulkaDodavatelu.length > 20) {
+    if (document.querySelector('.knoflik')) { document.querySelector('.knoflik').remove(); }
+    const radky = document.querySelectorAll('#dodavatele > tbody > tr');
+    let counter = 0;
+    radky.forEach((radek) => {
+      counter += 1;
+      if (counter > 20) {
+        radek.classList.add('zmiz');
+      }
+    });
+    const zobraz = document.createElement('button');
+    zobraz.classList.add('knoflik');
+    zobraz.innerHTML = 'Zobrazit zbývající dopravce';
+    document.querySelector('#dodavatele').parentNode.insertBefore(zobraz, document.querySelector('#dodavatele').nextSibling);
+    zobraz.addEventListener('click', (e) => {
+      radky.forEach((radek) => {
+        radek.classList.remove('zmiz');
+        zobraz.classList.add('zmiz');
+      });
+    });
+  }
 };
 
 // render - provadi se po kazde změně grafu nebo vybírátka
